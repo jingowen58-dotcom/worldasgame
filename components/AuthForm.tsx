@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import type { Copy } from "@/lib/copy";
 import type { Locale } from "@/lib/i18n";
 
@@ -26,12 +26,18 @@ export function AuthForm({
   token?: string;
 }) {
   const router = useRouter();
+  const [ready, setReady] = useState(false);
   const [message, setMessage] = useState("");
   const [devLink, setDevLink] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
+  useEffect(() => {
+    setReady(true);
+  }, []);
+
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!ready || pending) return;
     setPending(true);
     setMessage("");
     setDevLink(null);
@@ -94,7 +100,12 @@ export function AuthForm({
           : copy.auth.sendReset;
 
   return (
-    <form onSubmit={onSubmit} className="mt-8 max-w-md space-y-4">
+    <form
+      method="post"
+      action="#"
+      onSubmit={onSubmit}
+      className="mt-8 max-w-md space-y-4"
+    >
       <h1 className="text-3xl">{title}</h1>
       {mode !== "reset" ? (
         <label className="block text-sm text-mist">
@@ -123,10 +134,10 @@ export function AuthForm({
       ) : null}
       <button
         type="submit"
-        disabled={pending}
+        disabled={!ready || pending}
         className="btn-glow rounded-full px-5 py-3 text-sm text-white disabled:opacity-50"
       >
-        {action}
+        {ready ? action : copy.loading}
       </button>
       {message ? <p className="text-sm leading-6 text-mist">{message}</p> : null}
       {devLink ? (
