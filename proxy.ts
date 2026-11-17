@@ -6,7 +6,13 @@ const locales = ["en", "zh"];
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (pathname.startsWith("/admin") || pathname.startsWith("/api")) {
+  if (
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/api") ||
+    pathname.startsWith("/icon") ||
+    pathname.startsWith("/apple-icon") ||
+    pathname.startsWith("/manifest")
+  ) {
     return NextResponse.next();
   }
 
